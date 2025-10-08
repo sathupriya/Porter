@@ -1,12 +1,12 @@
-package com.example.Porter.Customer;
+package com.example.Porter.DeliveryAgent;
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,35 +21,35 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="customer_login_history")
+@Table(name="deliveryagent_password_table")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerLoginHistoryModel {
-
+public class DeliveryAgentPassword {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="customer_login_id")
-	private Long customerLoginId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long agentPasswordId;
 	
-	private LocalDateTime loginTime;
+	private boolean currentPasswordStatus;
 	
-	private LocalDateTime logoutTime;
+	private String hashedPassword;
 	
-	private String ipAddress;
+	private String reasonForChange;
 	
-	private String loginStatus;
+	private String createdBy;
+	
+	private String modifiedBy;
 	
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 	
-	private String sessionDuration;
+	@UpdateTimestamp
+	private LocalDateTime modifiedAt;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name="customer_id")
+	@JoinColumn(name="delivery_agent_id")
 	@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
-	private CustomerModel customer;
-	
+	private DeliveryAgentModel deliveryAgent;
 	
 }

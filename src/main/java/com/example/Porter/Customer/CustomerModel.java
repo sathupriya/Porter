@@ -2,25 +2,28 @@ package com.example.Porter.Customer;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.example.Porter.Location.LocationModel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,7 +45,7 @@ public class CustomerModel {
 	@Column(name = "customer_name", nullable = false)
 	private String customerName;
 
-	@Column(name = "mobile_number", nullable = false, unique = true)
+	@Column(name = "mobile_number", nullable = false,unique = true)
 	private String mobileNumber;
 
 	@Column(name = "email_address", nullable = false, unique = true)
@@ -50,21 +53,18 @@ public class CustomerModel {
 
 	@Column(name = "date_of_birth")
 	private String dateOfBirth;
-
-	@Transient
-	private String userPassword;
 	
 	@Column(name="hashed_password")
 	private String hashedPassword;
 
 	@Builder.Default
-	@Column(name = "active_status", nullable = false)
+	@Column(name = "active_status")
 	private boolean isActive = false;
 
 	@Column(name = "customer_address")
 	private String address;
 
-	@Column(name = "progile_picture")
+	@Column(name = "profile_picture")
 	private String profilePicture;
 
 	@Column(name = "created_by")
@@ -106,25 +106,28 @@ public class CustomerModel {
 	@Builder.Default
 	@Column(name = "log_out_status")
 	private boolean logOutStatus = false;
+	
+	@Column(name="reset_date_time")
+	private LocalDateTime resetDateTime;
+	
+	@Builder.Default
+	@Column(name="forgotpass_otp_verifiedstatus")
+	private boolean forgotPasswordVerifiedStatus = false;
+	
+	@Enumerated(EnumType.STRING)
+	private LoginType loginType;
+	
 
 	@Builder.Default
 	@OneToMany(mappedBy="customer",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private List<CustomerPasswordHistoryModel> customerPassword = new ArrayList<>();
 	
-	@PrePersist
-	@PreUpdate
-	private void hashPassword() {
-		if(userPassword != null && !userPassword.isBlank()) {
-			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-			String newHash = encoder.encode(userPassword);
-			if(this.hashedPassword == null || !encoder.matches(userPassword, this.hashedPassword)) {
-				if(this.hashedPassword != null) {
-					CustomerPasswordHistoryModel history = CustomerPasswordHistoryModel.builder().hashedPassword(this.hashedPassword).currentPasswordStatus(false).customer(this).build();
-					customerPassword.add(history);
-				}
-				
-				this.hashedPassword = newHash;
-			}
-		}
+	@ManyToOne(fetch=FetchType.LAZY,optional=false)
+	@JoinColumn(name="location_id",nullable=false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
+	private LocationModel location;
+	
+	public enum LoginType{
+		GOOGLE,PASSWORD
 	}
 }

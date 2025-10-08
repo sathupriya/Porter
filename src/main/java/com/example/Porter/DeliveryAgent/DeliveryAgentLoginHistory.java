@@ -1,9 +1,11 @@
-package com.example.Porter.Customer;
+package com.example.Porter.DeliveryAgent;
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.example.Porter.Customer.CustomerLoginHistoryModel;
+import com.example.Porter.Customer.CustomerModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -21,17 +23,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="customer_login_history")
+@Table(name="deliveryagent_login_history")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerLoginHistoryModel {
-
+public class DeliveryAgentLoginHistory {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="customer_login_id")
-	private Long customerLoginId;
+	private Long deliveryAgentLoginId;
 	
 	private LocalDateTime loginTime;
 	
@@ -47,9 +48,8 @@ public class CustomerLoginHistoryModel {
 	private String sessionDuration;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name="customer_id")
+	@JoinColumn(name="delivery_agent_id")
 	@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
-	private CustomerModel customer;
-	
+	private DeliveryAgentModel deliveryAgent;
 	
 }
